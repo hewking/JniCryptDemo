@@ -121,8 +121,28 @@ int hex2bin(const char *psAsciiData, unsigned char *sBinData, int iBinSize)
                // LOGI("error %s","ret != 0");
             }
 
+            LOGD("end es-1: %s\n", pstrDecryptBuf);
             string outStr(reinterpret_cast<char*>(pstrDecryptBuf));
+
+
+            unsigned char* endDec = NULL;
+            int endLen ;
+            LOGD("end dec es-1 before: %s, len: %d", pstrDecryptBuf, outDesLen);
+            int de_code = t_ClientDecrypt(pstrDecryptBuf, outDesLen, &endDec, &endLen);
+            if(de_code != 0){
+                LOGD("end dec error");
+            }else{
+                LOGD("end dec success");
+            }
+
+            LOGD("end dec es-1 after: %s, len: %d", endDec, endLen);
+
+//            return stoJstring(env, outStr.c_str());
+
+
+
             string destStr =  bin2hex(outStr);
+            LOGD("end bin2hex-1: %s\n", destStr.c_str());
 
             return stoJstring(env, destStr.c_str());
 
@@ -144,10 +164,7 @@ int hex2bin(const char *psAsciiData, unsigned char *sBinData, int iBinSize)
                      if(ret != 0){
                         // LOGI("error %s","ret != 0");
                      }
-                    // const char* buff = pstrDecryptBuf;
-                     // jbyteArray bytes = env->NewByteArray(strlen(pstrDecryptBuf));
-                      // env->SetByteArrayRegion(bytes, 0, strlen(pstrDecryptBuf), (jbyte*)pstrDecryptBuf);
-                       //  return pstrDecryptBuf;
+
                        const char* cp = (const char*)(char*)pstrDecryptBuf;
 
                        return stoJstring(env, cp);

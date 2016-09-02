@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 public class CryptActivity extends AppCompatActivity {
 
 
@@ -18,10 +21,30 @@ public class CryptActivity extends AppCompatActivity {
         tv_de = (TextView) findViewById(R.id.tv_de);
         EncryptUtil encryptUtil = new EncryptUtil();
 //        encryptUtil.clientInit();
-        String encrypt_s = " *  This program is free software; you can redistribute it and/or modify        *  it under the terms of the GNU General Public License as published by        *  the Free Software Foundation; either version 2 of the License, or        *(at your option) any later version.        *  This program is distributed in the hope that it will be useful,        *but WITHOUT ANY WARRANTY; without even the implied warranty of        *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the        *  GNU General Public License for more details.        *  You should have received a copy of the GNU General Public License along        *  with this program; if not, write to the Free Software Foundation, Inc.";
+        String encrypt_s = "hellosssssssssssssssssssssssssssssssss";
         String clientEncrypt = encryptUtil.clientEncrypt(encrypt_s, encrypt_s.length());
 //        String clientDencrypt = encryptUtil.clientDencrypt(clientEncrypt, clientEncrypt.length());
         tv.setText(clientEncrypt);
 //        tv_de.setText(clientDencrypt);
     }
+
+    public static String getUTF8XMLString(String xml) {
+        // A StringBuffer Object
+        StringBuffer sb = new StringBuffer();
+        sb.append(xml);
+        String xmString = "";
+        String xmlUTF8="";
+        try {
+            xmString = new String(sb.toString().getBytes("UTF-8"));
+            xmlUTF8 = URLEncoder.encode(xmString, "UTF-8");
+            System.out.println("utf-8 编码：" + xmlUTF8) ;
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        // return to String Formed
+        return xmlUTF8;
+    }
+
+
 }
