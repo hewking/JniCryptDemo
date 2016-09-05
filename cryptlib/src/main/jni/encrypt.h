@@ -22,4 +22,5 @@
 
       int inline  bin_to_hex(const char * hex, char * buf, int bit);
 
+
 #endif //JNITEST_ENCRYPT_H

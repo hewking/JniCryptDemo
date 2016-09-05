@@ -26,10 +26,10 @@ JNIEXPORT jstring JNICALL Java_com_dlodlo_cryptlib_EncryptUtil_clientEncrypt
 /*
  * Class:     com_dlodlo_cryptlib_EncryptUtil
  * Method:    clientDencrypt
- * Signature: (Ljava/lang/String;I)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;II)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_dlodlo_cryptlib_EncryptUtil_clientDencrypt
-  (JNIEnv *, jobject, jstring, jint);
+  (JNIEnv *, jobject, jstring, jint, jint);
 
 #ifdef __cplusplus
 }

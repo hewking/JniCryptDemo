@@ -15,6 +15,6 @@ public class EncryptUtil {
 
     public native String clientEncrypt(String intput, int in_len);
 
-    public native String clientDencrypt(String intput, int in_len);
+    public native String clientDencrypt(String intput, int in_len,int expressInput);
 
 }

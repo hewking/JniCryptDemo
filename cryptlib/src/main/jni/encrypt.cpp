@@ -84,6 +84,130 @@ int hex2bin(const char *psAsciiData, unsigned char *sBinData, int iBinSize)
 }
 
 
+string hex2bin(const string &sString, const string &sSep, size_t lines)
+{
+    const char *psAsciiData = sString.c_str();
+
+    int iAsciiLength = sString.length();
+    string sBinData;
+    for (int i = 0 ; i < iAsciiLength ; i++)
+    {
+        sBinData += hex2char(psAsciiData + i);
+        i++;
+        i += sSep.length(); //过滤掉分隔符
+
+        if (lines != 0 && sBinData.length()%lines == 0)
+        {
+            i++;    //过滤掉回车
+        }
+    }
+
+    return sBinData;
+}
+
+string hex2bin(const char *psAsciiData, size_t len, const string &sSep, size_t lines)
+{
+    return hex2bin(string(psAsciiData,len),sSep,lines);
+}
+
+
+/**
+    新增16进制二进制相互转换
+**/
+string BinToHex(const string &strBin, bool bIsUpper = false)
+{
+    string strHex;
+    strHex.resize(strBin.size() * 2);
+    for (size_t i = 0; i < strBin.size(); i++)
+    {
+        uint8_t cTemp = strBin[i];
+        for (size_t j = 0; j < 2; j++)
+        {
+            uint8_t cCur = (cTemp & 0x0f);
+            if (cCur < 10)
+            {
+                cCur += '0';
+            }
+            else
+            {
+                cCur += ((bIsUpper ? 'A' : 'a') - 10);
+            }
+            strHex[2 * i + 1 - j] = cCur;
+            cTemp >>= 4;
+        }
+    }
+
+    return strHex;
+}
+
+string HexToBin(const string &strHex)
+{
+ LOGI("end es-1: HexToBin strHex size %d \n",strHex.size());
+    if (strHex.size() % 2 != 0)
+    {
+        return "";
+    }
+
+    string strBin;
+    strBin.resize(strHex.size() / 2);
+    for (size_t i = 0; i < strBin.size(); i++)
+    {
+        uint8_t cTemp = 0;
+        for (size_t j = 0; j < 2; j++)
+        {
+            char cCur = strHex[2 * i + j];
+            if (cCur >= '0' && cCur <= '9')
+            {
+                cTemp = (cTemp << 4) + (cCur - '0');
+            }
+            else if (cCur >= 'a' && cCur <= 'f')
+            {
+                cTemp = (cTemp << 4) + (cCur - 'a' + 10);
+            }
+            else if (cCur >= 'A' && cCur <= 'F')
+            {
+                cTemp = (cTemp << 4) + (cCur - 'A' + 10);
+            }
+            else
+            {
+                return "";
+            }
+        }
+        strBin[i] = cTemp;
+    }
+
+    return strBin;
+}
+
+string* byteToHexStr(unsigned char byte_arr[], int arr_len)
+{
+    string*  hexstr=new string();
+    for (int i=0;i<arr_len;i++)
+    {
+    char hex1;
+    char hex2;
+    int value=byte_arr[i]; //直接将unsigned char赋值给整型的值，系统会正动强制转换
+    int v1=value/16;
+    int v2=value % 16;
+
+    //将商转成字母
+    if (v1>=0&&v1<=9)
+    hex1=(char)(48+v1);
+    else
+    hex1=(char)(55+v1);
+
+    //将余数转成字母
+    if (v2>=0&&v2<=9)
+    hex2=(char)(48+v2);
+    else
+    hex2=(char)(55+v2);
+
+    //将字母连接成串
+    *hexstr=*hexstr+hex1+hex2;
+    }
+    return hexstr;
+}
+
 
 
     int t_ClientInit(){
@@ -115,16 +239,34 @@ int hex2bin(const char *psAsciiData, unsigned char *sBinData, int iBinSize)
 
              int outDesLen;
              encryptInfo = jstringTostring(env, s);
-
-            int ret = t_ClientEncrypt(encryptInfo, length, &pstrDecryptBuf, &outDesLen);
+             LOGI("end es-1: before encrypt \n");
+             LOGI("end es-1: before encrypt %s    length%d \n", encryptInfo,encryptlen);
+             t_ClientInit();
+            int ret = t_ClientEncrypt(encryptInfo, encryptlen, &pstrDecryptBuf, &outDesLen);
             if(ret != 0){
-               // LOGI("error %s","ret != 0");
+                LOGI("error %s  %d","ret != 0",ret);
             }
+            const char* cp = (const char*)(char*)pstrDecryptBuf;
+            LOGI("end es-1 after: %s\n   %d   pstrDecryptBufL %d", pstrDecryptBuf,ret,strlen(cp));
 
-            string outStr(reinterpret_cast<char*>(pstrDecryptBuf));
-            string destStr =  bin2hex(outStr);
+            unsigned char* pstrDecryptBuf_des = new unsigned char[outDesLen];
+             LOGI("end es-1 after:  outDesLen : %d \n ",outDesLen);
+            for(int i = 0 ; i < outDesLen ; i ++){
+                  pstrDecryptBuf_des[i] = pstrDecryptBuf[i];
+                  LOGI("for ===== %d   %02x",i,pstrDecryptBuf_des[i]);
+             }
 
+
+             string* sci_ii_str = byteToHexStr(pstrDecryptBuf,outDesLen);
+            LOGI("end es-1 after: sci_ii_str %s",sci_ii_str);
+
+
+             LOGI("end es-1 after: %s\n   %d   pstrDecryptBuf_des %d", pstrDecryptBuf_des,ret,strlen((const char*)(char*)pstrDecryptBuf_des));
+            string outStr(reinterpret_cast<char*>(pstrDecryptBuf_des));
+            string destStr =  BinToHex(outStr);
+            LOGI("end bin2hex-1: %s   outDesLen %d   outStrLen %d\n", destStr.c_str(),outDesLen,sizeof(outStr.c_str()));
             return stoJstring(env, destStr.c_str());
+           // return stoJstring(env, deoutStr.c_str());
 
               /*
               const char* cp = (const char*)(char*)pstrDecryptBuf;
@@ -134,23 +276,28 @@ int hex2bin(const char *psAsciiData, unsigned char *sBinData, int iBinSize)
         }
 
         JNIEXPORT jstring JNICALL Java_com_dlodlo_cryptlib_EncryptUtil_clientDencrypt
-          (JNIEnv *env, jobject obj, jstring s, jint length){
-                      unsigned char* encryptInfo;
-                      int encryptlen = length;
-                      unsigned char* pstrDecryptBuf = NULL;
-                      int decryptlen;
-                      encryptInfo = jstringTostring(env,s);
-                     int ret = t_ClientEncrypt(encryptInfo, encryptlen, &pstrDecryptBuf, &decryptlen);
-                     if(ret != 0){
-                        // LOGI("error %s","ret != 0");
-                     }
-                    // const char* buff = pstrDecryptBuf;
-                     // jbyteArray bytes = env->NewByteArray(strlen(pstrDecryptBuf));
-                      // env->SetByteArrayRegion(bytes, 0, strlen(pstrDecryptBuf), (jbyte*)pstrDecryptBuf);
-                       //  return pstrDecryptBuf;
-                       const char* cp = (const char*)(char*)pstrDecryptBuf;
+          (JNIEnv *env, jobject obj, jstring s, jint length,jint express){
+                    unsigned char* decryptInfo;
+                    int decryptlen = length;
+                    unsigned char* pstrDecryptBuf = NULL;
+                    int expresslen = express;
+                    decryptInfo = jstringTostring(env,s);
 
-                       return stoJstring(env, cp);
+                     string inputStr(reinterpret_cast<char*>(decryptInfo));
+                     string inputdestStr =  HexToBin(inputStr);
+
+                     t_ClientInit();
+                      LOGI("clientDencrypt before  %s  %d \n  inputdestStr %s ",decryptInfo,expresslen,inputdestStr.c_str());
+
+                       const unsigned char* u_c_deceptInput = (const unsigned char*)(char*)inputdestStr.c_str();
+                         const char* inputdestStr_c = (const char*)(char*)u_c_deceptInput;
+                     int ret = t_ClientDecrypt(u_c_deceptInput, 768/*strlen(inputdestStr_c)*/, &pstrDecryptBuf, &expresslen);
+                       LOGI("clientDencrypt after  %s  expresslen %d  \n u_c_deceptInput  %s\n   strlen(inputdestStr_c) %d",pstrDecryptBuf,expresslen,inputdestStr_c,strlen(inputdestStr_c));
+                     if(ret != 0){
+                         LOGI("error %s %d\n","ret != 0",ret);
+                     }
+                     string outStr(reinterpret_cast<char*>(pstrDecryptBuf));
+                     return stoJstring(env, outStr.c_str());
           }
 
 
