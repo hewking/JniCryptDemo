@@ -16,9 +16,9 @@
 
         </activity>
 
-        <activity android:name="com.dlodlo.objectjnidemo.JniObjectActivity">
+        <!--<activity android:name="com.dlodlo.objectjnidemo.JniObjectActivity">-->
 
-        </activity>
+        <!--</activity>-->
         
         <activity android:name="com.dlodlo.cryptlib.CryptActivity">
 

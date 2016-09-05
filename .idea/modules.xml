@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/JniCryptDemo.iml" filepath="$PROJECT_DIR$/JniCryptDemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/JniTest.iml" filepath="$PROJECT_DIR$/JniTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/cryptlib/cryptlib.iml" filepath="$PROJECT_DIR$/cryptlib/cryptlib.iml" />

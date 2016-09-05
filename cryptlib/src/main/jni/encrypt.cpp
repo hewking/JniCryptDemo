@@ -3,6 +3,7 @@
 //
 #include "ClientCrypt.h"
 #include <encrypt.h>
+#include <ctype.h>
 #include <com_dlodlo_cryptlib_EncryptUtil.h>
 #include <android/log.h>
 
@@ -208,6 +209,98 @@ string* byteToHexStr(unsigned char byte_arr[], int arr_len)
     return hexstr;
 }
 
+/**
+* @brief 该函数实现了将二进制字节数据转换为可打印ASCII码字符串
+* @param[in] pSrc 源数据指针
+* @param[in] nSrcLength 源数据长度
+* @param[out] pDst 目标字符串指针
+* @return 目标字符串长度
+*/
+int BinaryBytes2String1(const unsigned char* pSrc, unsigned int nSrcLength, char* pDst)
+{
+    if ( pSrc == 0 || pDst == 0 )
+        return 0;
+
+    char* p = pDst;
+
+    for ( unsigned i = 0; i < nSrcLength; i++ )
+    {
+        *p = (pSrc[i] >> 4) & 0x0f;
+        *p += *p < 10 ? 0x30 : (0x61 - 10);
+        p++;
+
+        *p = pSrc[i] & 0x0f;
+        *p += *p < 10 ? 0x30 : (0x61 - 10);
+        p++;
+    }
+
+    *p = '/0';
+    return nSrcLength * 2;
+}
+
+/**
+* @brief 该函数实现了将可打印ASCII码字符串转换为二进制字节数据
+* @param[in] pSrc 源数据指针
+* @param[out] pDst 目标字符串指针
+* @param[in] nSrcLength 源数据长度
+* @param[out] nDstLength 目标字符串长度
+* @return 返回操作结果
+* - 0 表示操作成功
+* - -1 表示操作失败
+*/
+
+int asciihex2bin(const char* pSrc, unsigned char* pDst, unsigned int nSrcLength, unsigned int& nDstLength)
+{
+    if ( (pSrc == 0) || (pDst == 0) )
+    {
+        return -1;
+    }
+
+    nDstLength = 0;
+
+    if ( pSrc[0] == 0 ) // nothing to convert
+        return 0;
+
+    // 计算需要转换的字节数
+    for ( int j = 0; pSrc[j]; j++ )
+    {
+        if ( isxdigit(pSrc[j]) )
+            nDstLength++;
+    }
+
+    // 判断待转换字节数是否为奇数，然后加一
+    if ( nDstLength & 0x01 ) nDstLength++;
+    nDstLength /= 2;
+
+    if ( nDstLength > nSrcLength )
+        return -1;
+
+    nDstLength = 0;
+
+    int phase = 0;
+
+    for ( int i = 0; pSrc[i]; i++ )
+    {
+        if ( ! isxdigit(pSrc[i]) )
+            continue;
+
+        unsigned char val = pSrc[i] - ( isdigit(pSrc[i]) ? 0x30 : ( isupper(pSrc[i]) ? 0x37 : 0x57 ) );
+
+        if ( phase == 0 )
+        {
+            pDst[nDstLength] = val << 4;
+            phase++;
+        }
+        else
+        {
+            pDst[nDstLength] |= val;
+            phase = 0;
+            nDstLength++;
+        }
+    }
+
+    return 0;
+}
 
 
     int t_ClientInit(){
@@ -256,16 +349,21 @@ string* byteToHexStr(unsigned char byte_arr[], int arr_len)
                   LOGI("for ===== %d   %02x",i,pstrDecryptBuf_des[i]);
              }
 
+            char result[2 * outDesLen + 1];
+             int dec2asc_len = BinaryBytes2String1(pstrDecryptBuf,outDesLen,result);
+            LOGI("end es-1 after: result %s",result);
 
-             string* sci_ii_str = byteToHexStr(pstrDecryptBuf,outDesLen);
-            LOGI("end es-1 after: sci_ii_str %s",sci_ii_str);
+                unsigned char result_asc[dec2asc_len / 2 + 1];
+                unsigned int nResult = 0;
+                asciihex2bin(result, result_asc, dec2asc_len, nResult);
 
 
-             LOGI("end es-1 after: %s\n   %d   pstrDecryptBuf_des %d", pstrDecryptBuf_des,ret,strlen((const char*)(char*)pstrDecryptBuf_des));
-            string outStr(reinterpret_cast<char*>(pstrDecryptBuf_des));
-            string destStr =  BinToHex(outStr);
-            LOGI("end bin2hex-1: %s   outDesLen %d   outStrLen %d\n", destStr.c_str(),outDesLen,sizeof(outStr.c_str()));
-            return stoJstring(env, destStr.c_str());
+
+            // LOGI("end es-1 after: %s\n   %d   pstrDecryptBuf_des %d", pstrDecryptBuf_des,ret,strlen((const char*)(char*)pstrDecryptBuf_des));
+            string outStr(reinterpret_cast<char*>(result_asc));
+           // string destStr =  BinToHex(outStr);
+           // LOGI("end bin2hex-1: %s   outDesLen %d   outStrLen %d\n", destStr.c_str(),outDesLen,sizeof(outStr.c_str()));
+            return stoJstring(env, outStr.c_str());
            // return stoJstring(env, deoutStr.c_str());
 
               /*
