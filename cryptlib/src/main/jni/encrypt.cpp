@@ -339,6 +339,7 @@ int asciihex2bin(const char* pSrc, unsigned char* pDst, unsigned int nSrcLength,
             if(ret != 0){
                 LOGI("error %s  %d","ret != 0",ret);
             }
+            /*
             const char* cp = (const char*)(char*)pstrDecryptBuf;
             LOGI("end es-1 after: %s\n   %d   pstrDecryptBufL %d", pstrDecryptBuf,ret,strlen(cp));
 
@@ -348,19 +349,36 @@ int asciihex2bin(const char* pSrc, unsigned char* pDst, unsigned int nSrcLength,
                   pstrDecryptBuf_des[i] = pstrDecryptBuf[i];
                   LOGI("for ===== %d   %02x",i,pstrDecryptBuf_des[i]);
              }
+             */
 
             char result[2 * outDesLen + 1];
              int dec2asc_len = BinaryBytes2String1(pstrDecryptBuf,outDesLen,result);
             LOGI("end es-1 after: result %s",result);
+            result[dec2asc_len] = 0;
+            free(pstrDecryptBuf);
 
+/*
                 unsigned char result_asc[dec2asc_len / 2 + 1];
                 unsigned int nResult = 0;
                 asciihex2bin(result, result_asc, dec2asc_len, nResult);
+                LOGI("asciihex2bin after: result %s       len %d",result_asc,nResult);
 
+                //解密测试
 
-
+                unsigned char* t_pstrDecryptBuf = NULL;
+                int expresslen = encryptlen;
+                 t_ClientInit();
+                 LOGI("t_ClientDecrypt bfore \n");
+                 int deret = t_ClientDecrypt(result_asc, nResult, &t_pstrDecryptBuf, &expresslen);
+                 if(deret != 0){
+                      LOGI("t_ClientDecrypt after: falil  %d \n",deret);
+                 }else{
+                      LOGI("t_ClientDecrypt after: success  %s  \n",t_pstrDecryptBuf);
+                 }
+                 LOGI("t_ClientDecrypt after %d \n",deret);
             // LOGI("end es-1 after: %s\n   %d   pstrDecryptBuf_des %d", pstrDecryptBuf_des,ret,strlen((const char*)(char*)pstrDecryptBuf_des));
-            string outStr(reinterpret_cast<char*>(result_asc));
+            */
+            string outStr(reinterpret_cast<char*>(result));
            // string destStr =  BinToHex(outStr);
            // LOGI("end bin2hex-1: %s   outDesLen %d   outStrLen %d\n", destStr.c_str(),outDesLen,sizeof(outStr.c_str()));
             return stoJstring(env, outStr.c_str());
@@ -381,20 +399,32 @@ int asciihex2bin(const char* pSrc, unsigned char* pDst, unsigned int nSrcLength,
                     int expresslen = express;
                     decryptInfo = jstringTostring(env,s);
 
+/*
                      string inputStr(reinterpret_cast<char*>(decryptInfo));
                      string inputdestStr =  HexToBin(inputStr);
+*/
+                     unsigned char result_asc[decryptlen / 2 + 1];
+                     unsigned int nResult = 0;
+                     string acciioutstr(reinterpret_cast<char*>(decryptInfo));
+                     asciihex2bin(acciioutstr.c_str(), result_asc, decryptlen, nResult);
+                     LOGI(" clientDencrypt  asciihex2bin after: result %s       len %d",result_asc,nResult);
+
 
                      t_ClientInit();
-                      LOGI("clientDencrypt before  %s  %d \n  inputdestStr %s ",decryptInfo,expresslen,inputdestStr.c_str());
+                    //  LOGI("clientDencrypt before  %s  %d \n  inputdestStr %s ",decryptInfo,expresslen,inputdestStr.c_str());
 
+                        /*
                        const unsigned char* u_c_deceptInput = (const unsigned char*)(char*)inputdestStr.c_str();
                          const char* inputdestStr_c = (const char*)(char*)u_c_deceptInput;
-                     int ret = t_ClientDecrypt(u_c_deceptInput, 768/*strlen(inputdestStr_c)*/, &pstrDecryptBuf, &expresslen);
-                       LOGI("clientDencrypt after  %s  expresslen %d  \n u_c_deceptInput  %s\n   strlen(inputdestStr_c) %d",pstrDecryptBuf,expresslen,inputdestStr_c,strlen(inputdestStr_c));
+                         */
+                     int ret = t_ClientDecrypt(result_asc, nResult/*strlen(inputdestStr_c)*/, &pstrDecryptBuf, &expresslen);
+                       //LOGI("clientDencrypt after  %s  expresslen %d  \n u_c_deceptInput  %s\n   strlen(inputdestStr_c) %d",pstrDecryptBuf,expresslen,inputdestStr_c,strlen(inputdestStr_c));
+                     pstrDecryptBuf[expresslen] = 0;
                      if(ret != 0){
                          LOGI("error %s %d\n","ret != 0",ret);
                      }
                      string outStr(reinterpret_cast<char*>(pstrDecryptBuf));
+                     free(pstrDecryptBuf);
                      return stoJstring(env, outStr.c_str());
           }
 

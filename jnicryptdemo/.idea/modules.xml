@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/JniCryptDemo.iml" filepath="$PROJECT_DIR$/JniCryptDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JniTest.iml" filepath="$PROJECT_DIR$/JniTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cryptlib/cryptlib.iml" filepath="$PROJECT_DIR$/cryptlib/cryptlib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/encryptlib/encryptlib.iml" filepath="$PROJECT_DIR$/encryptlib/encryptlib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mylibrary/mylibrary.iml" filepath="$PROJECT_DIR$/mylibrary/mylibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/objectjnidemo/objectjnidemo.iml" filepath="$PROJECT_DIR$/objectjnidemo/objectjnidemo.iml" />
+    </modules>
+  </component>
+</project>
