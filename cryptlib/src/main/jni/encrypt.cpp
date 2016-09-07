@@ -396,7 +396,7 @@ int asciihex2bin(const char* pSrc, unsigned char* pDst, unsigned int nSrcLength,
                     unsigned char* decryptInfo;
                     int decryptlen = length;
                     unsigned char* pstrDecryptBuf = NULL;
-                    int expresslen = express;
+                    int expresslen = express + 1;
                     decryptInfo = jstringTostring(env,s);
 
 /*
